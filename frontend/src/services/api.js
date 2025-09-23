@@ -1,21 +1,78 @@
+'''
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://127.0.0.1:8000',
+  baseURL: 'http://localhost:8000',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-export const registerUser = (userData) => {
-  return apiClient.post('/auth/register', userData);
-};
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-// Add this new function
-export const loginUser = (credentials) => {
-  // The backend expects form data for login, not JSON.
-  const formData = new URLSearchParams();
-  formData.append('username', credentials.email);
-  formData.append('password', credentials.password);
+export default {
+  // Authentication
+  login(credentials) {
+    return apiClient.post('/auth/login', credentials);
+  },
+  register(userData) {
+    return apiClient.post('/auth/register', userData);
+  },
 
-  return apiClient.post('/auth/login', formData, {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  });
+  // Events
+  getEvents() {
+    return apiClient.get('/events');
+  },
+  getEventById(id) {
+    return apiClient.get(`/events/${id}`);
+  },
+  createEvent(eventData) {
+    return apiClient.post('/events', eventData);
+  },
+  updateEvent(id, eventData) {
+    return apiClient.put(`/events/${id}`, eventData);
+  },
+  deleteEvent(id) {
+    return apiClient.delete(`/events/${id}`);
+  },
+
+  // Users
+  getCurrentUser() {
+    return apiClient.get('/users/me');
+  },
+  saveEvent(eventId) {
+    return apiClient.post(`/users/me/saved-events/${eventId}`);
+  },
+  unsaveEvent(eventId) {
+    return apiClient.delete(`/users/me/saved-events/${eventId}`);
+  },
+
+  // Colleges
+  getColleges() {
+    return apiClient.get('/colleges');
+  },
+  registerCollege(collegeData) {
+    return apiClient.post('/colleges', collegeData);
+  },
+
+  // Admin
+  getPendingColleges() {
+    return apiClient.get('/admin/colleges/pending');
+  },
+  approveCollege(id) {
+    return apiClient.put(`/admin/colleges/${id}/approve`);
+  },
+  getUsers() {
+    return apiClient.get('/admin/users');
+  },
+  assignRepRole(id) {
+    return apiClient.put(`/admin/users/${id}/assign-rep`);
+  },
 };
+'''

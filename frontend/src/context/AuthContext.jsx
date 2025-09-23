@@ -1,39 +1,49 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { loginUser as loginApi } from '../services/api';
+'''
+import React, { createContext, useState, useEffect } from 'react';
+import api from '../services/api';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for a token in local storage when the app loads
-    const storedToken = localStorage.getItem('authToken');
-    if (storedToken) {
-      setToken(storedToken);
+    const token = localStorage.getItem('token');
+    if (token) {
+      api.getCurrentUser().then(response => {
+        setUser(response.data);
+      }).catch(() => {
+        localStorage.removeItem('token');
+      }).finally(() => {
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
     }
   }, []);
 
-  const login = async (email, password) => {
-    const response = await loginApi({ email, password });
-    const { access_token } = response.data;
-    localStorage.setItem('authToken', access_token);
-    setToken(access_token);
+  const login = async (credentials) => {
+    const response = await api.login(credentials);
+    localStorage.setItem('token', response.data.access_token);
+    const userResponse = await api.getCurrentUser();
+    setUser(userResponse.data);
+  };
+
+  const register = async (userData) => {
+    await api.register(userData);
+    // You might want to automatically log in the user after registration
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
-    setToken(null);
+    localStorage.removeItem('token');
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-// Custom hook to use the auth context
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+'''
