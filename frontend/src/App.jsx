@@ -5,7 +5,7 @@ function App() {
   return (
     <div>
       <Navbar />
-      <main style={{ padding: '1rem' }}>
+      <main>
         <Outlet />
       </main>
     </div>

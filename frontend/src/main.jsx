@@ -1,35 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router'; // We will create this file next
+import { MantineProvider } from '@mantine/core';
+import { AuthProvider } from './context/AuthContext';
 
-import App from './App.jsx';
-import HomePage from './pages/HomePage.jsx';
-import LoginPage from './pages/LoginPage.jsx';
-import RegisterPage from './pages/RegisterPage.jsx';
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      {
-        index: true, // This makes HomePage the default child route
-        element: <HomePage />,
-      },
-      {
-        path: "login",
-        element: <LoginPage />,
-      },
-      {
-        path: "register",
-        element: <RegisterPage />,
-      },
-    ],
-  },
-]);
+// Import Mantine styles
+import '@mantine/core/styles.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <MantineProvider withGlobalStyles withNormalizeCSS>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </MantineProvider>
   </React.StrictMode>
 );

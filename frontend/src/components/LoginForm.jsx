@@ -1,58 +1,61 @@
 import { useState } from 'react';
-import { loginUser } from '../services/api'; // Import the login function
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { TextInput, PasswordInput, Button, Paper, Title, Alert } from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons-react';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
-
     try {
-      const response = await loginUser({ email, password });
-      const { access_token } = response.data;
-
-      // Store the token in the browser's local storage
-      localStorage.setItem('authToken', access_token);
-
-      console.log('Login successful, token saved!');
-      // Here we will redirect the user to the homepage
-      window.location.href = '/'; // Simple redirect for now
+      await login(email, password);
+      navigate('/');
     } catch (err) {
-      console.error('Login failed:', err.response.data);
-      setError(err.response.data.detail || 'Login failed.');
+      setError(err.response?.data?.detail || 'Login failed.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {/* ... keep the input fields the same ... */}
-        <div>
-            <label htmlFor="email">Email:</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-      <button type="submit">Login</button>
-    </form>
+    <Paper withBorder shadow="md" p="xl" mt="xl" radius="md" style={{ maxWidth: 450, margin: 'auto' }}>
+      <Title order={2} align="center" mb="lg">
+        Login
+      </Title>
+
+      {error && (
+        <Alert icon={<IconAlertCircle size="1rem" />} title="Error!" color="red" mb="md">
+          {error}
+        </Alert>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <TextInput
+          label="Email"
+          placeholder="you@email.com"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.currentTarget.value)}
+          mb="md"
+        />
+        <PasswordInput
+          label="Password"
+          placeholder="Your password"
+          required
+          value={password}
+          onChange={(event) => setPassword(event.currentTarget.value)}
+          mb="lg"
+        />
+        <Button type="submit" fullWidth>
+          Sign In
+        </Button>
+      </form>
+    </Paper>
   );
 }
 
