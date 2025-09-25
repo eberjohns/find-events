@@ -1,5 +1,7 @@
+
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { TextInput, Button, Paper, Title, Alert, Group } from '@mantine/core';
 
 function RegisterCollegeForm() {
   const { token } = useAuth();
@@ -30,20 +32,34 @@ function RegisterCollegeForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Register College</h2>
-      {success && <p>College registered! Awaiting approval.</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <div>
-        <label>Name</label>
-        <input value={name} onChange={e => setName(e.target.value)} required />
-      </div>
-      <div>
-        <label>Location</label>
-        <input value={location} onChange={e => setLocation(e.target.value)} required />
-      </div>
-      <button type="submit">Register</button>
-    </form>
+    <Paper withBorder shadow="md" p="xl" mt="xl" radius="md" style={{ maxWidth: 500, margin: 'auto' }}>
+      <Title order={2} align="center" mb="lg">
+        Register College
+      </Title>
+      {success && <Alert color="green" mb="md">College registered! Awaiting approval.</Alert>}
+      {error && <Alert color="red" mb="md">{error}</Alert>}
+      <form onSubmit={handleSubmit}>
+        <TextInput
+          label="Name"
+          placeholder="College name"
+          value={name}
+          onChange={e => setName(e.currentTarget.value)}
+          required
+          mb="md"
+        />
+        <TextInput
+          label="Location"
+          placeholder="College location"
+          value={location}
+          onChange={e => setLocation(e.currentTarget.value)}
+          required
+          mb="lg"
+        />
+        <Group position="right">
+          <Button type="submit">Register</Button>
+        </Group>
+      </form>
+    </Paper>
   );
 }
 

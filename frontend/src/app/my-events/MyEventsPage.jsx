@@ -1,5 +1,9 @@
+
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { Paper, Title, Text, Loader, Alert, List, ThemeIcon, Group, Container } from '@mantine/core';
+import { IconBookmark } from '@tabler/icons-react';
+import { Link } from 'react-router-dom';
 
 function MyEventsPage() {
   const [events, setEvents] = useState([]);
@@ -24,16 +28,27 @@ function MyEventsPage() {
   }, [token]);
 
   return (
-    <div>
-      <h2>My Saved Events</h2>
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <ul>
-        {events.map(event => (
-          <li key={event.id}>{event.name}</li>
-        ))}
-      </ul>
-    </div>
+    <Container size="sm" py="xl">
+      <Paper withBorder shadow="md" p="xl" radius="md">
+        <Title order={2} mb="md">My Saved Events</Title>
+        {loading && <Group position="center"><Loader /></Group>}
+        {error && <Alert color="red" mb="md">{error}</Alert>}
+        {!loading && !error && events.length === 0 && <Text>No saved events found.</Text>}
+        <List spacing="md" size="md" icon={<ThemeIcon color="yellow" size={24} radius="xl"><IconBookmark size={16} /></ThemeIcon>}>
+          {events.map(event => (
+            <List.Item key={event.id}>
+              <Link to={`/events/${event.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Title order={5} mb={2} style={{ cursor: 'pointer', color: '#228be6' }}>{event.name}</Title>
+                <Text size="sm" color="dimmed">{event.description}</Text>
+                <Text size="xs" color="dimmed">
+                  {new Date(event.start_time).toLocaleString()} - {new Date(event.end_time).toLocaleString()}
+                </Text>
+              </Link>
+            </List.Item>
+          ))}
+        </List>
+      </Paper>
+    </Container>
   );
 }
 

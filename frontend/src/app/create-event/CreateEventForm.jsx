@@ -1,6 +1,8 @@
+
 import { useState } from 'react';
 import { createEvent } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { TextInput, Textarea, Button, Paper, Title, Alert, Group } from '@mantine/core';
 
 
 function CreateEventForm() {
@@ -34,28 +36,50 @@ function CreateEventForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Create Event</h2>
-      {success && <p>Event created!</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <div>
-        <label>Name</label>
-        <input value={name} onChange={e => setName(e.target.value)} required />
-      </div>
-      <div>
-        <label>Description</label>
-        <textarea value={description} onChange={e => setDescription(e.target.value)} required />
-      </div>
-      <div>
-        <label>Start Time</label>
-        <input type="datetime-local" value={startTime} onChange={e => setStartTime(e.target.value)} required />
-      </div>
-      <div>
-        <label>End Time</label>
-        <input type="datetime-local" value={endTime} onChange={e => setEndTime(e.target.value)} required />
-      </div>
-      <button type="submit">Create</button>
-    </form>
+    <Paper withBorder shadow="md" p="xl" mt="xl" radius="md" style={{ maxWidth: 500, margin: 'auto' }}>
+      <Title order={2} align="center" mb="lg">
+        Create Event
+      </Title>
+      {success && <Alert color="green" mb="md">Event created!</Alert>}
+      {error && <Alert color="red" mb="md">{error}</Alert>}
+      <form onSubmit={handleSubmit}>
+        <TextInput
+          label="Name"
+          placeholder="Event name"
+          value={name}
+          onChange={e => setName(e.currentTarget.value)}
+          required
+          mb="md"
+        />
+        <Textarea
+          label="Description"
+          placeholder="Event description"
+          value={description}
+          onChange={e => setDescription(e.currentTarget.value)}
+          required
+          mb="md"
+        />
+        <TextInput
+          label="Start Time"
+          type="datetime-local"
+          value={startTime}
+          onChange={e => setStartTime(e.currentTarget.value)}
+          required
+          mb="md"
+        />
+        <TextInput
+          label="End Time"
+          type="datetime-local"
+          value={endTime}
+          onChange={e => setEndTime(e.currentTarget.value)}
+          required
+          mb="lg"
+        />
+        <Group position="right">
+          <Button type="submit">Create</Button>
+        </Group>
+      </form>
+    </Paper>
   );
 }
 

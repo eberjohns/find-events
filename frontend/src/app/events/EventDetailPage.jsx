@@ -1,7 +1,10 @@
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchEventById, saveEvent, unsaveEvent } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { Paper, Title, Text, Button, Group, Loader, Alert } from '@mantine/core';
+import { IconBookmark, IconBookmarkOff } from '@tabler/icons-react';
 
 
 function EventDetailPage() {
@@ -49,30 +52,32 @@ function EventDetailPage() {
     setSaving(false);
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
-  if (!event) return <p>Event not found.</p>;
+  if (loading) return <Group position="center"><Loader /></Group>;
+  if (error) return <Alert color="red">{error}</Alert>;
+  if (!event) return <Alert color="yellow">Event not found.</Alert>;
 
   return (
-    <div>
-      <h2>{event.name}</h2>
-      <p>{event.description}</p>
-      <p>
+    <Paper withBorder shadow="md" p="xl" mt="xl" radius="md" style={{ maxWidth: 600, margin: 'auto' }}>
+      <Title order={2} mb="sm">{event.name}</Title>
+      <Text mb="md">{event.description}</Text>
+      <Text size="sm" color="dimmed" mb="xs">
         {new Date(event.start_time).toLocaleString()} - {new Date(event.end_time).toLocaleString()}
-      </p>
-      <p>College ID: {event.college_id}</p>
+      </Text>
+      <Text size="sm" color="dimmed" mb="md">College ID: {event.college_id}</Text>
       {token && (
-        saved ? (
-          <button onClick={handleUnsave} disabled={saving}>
-            Unsave Event
-          </button>
-        ) : (
-          <button onClick={handleSave} disabled={saving}>
-            Save Event
-          </button>
-        )
+        <Group>
+          {saved ? (
+            <Button leftIcon={<IconBookmarkOff size={16} />} color="yellow" variant="outline" onClick={handleUnsave} loading={saving}>
+              Unsave Event
+            </Button>
+          ) : (
+            <Button leftIcon={<IconBookmark size={16} />} color="blue" onClick={handleSave} loading={saving}>
+              Save Event
+            </Button>
+          )}
+        </Group>
       )}
-    </div>
+    </Paper>
   );
 }
 
