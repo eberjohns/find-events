@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import { fetchEvents } from '../services/api';
 import { Link } from 'react-router-dom';
-import { Paper, Title, Text, Loader, Alert, List, ThemeIcon, Group } from '@mantine/core';
-import { IconCalendarEvent } from '@tabler/icons-react';
+import { Paper, Title, Text, Loader, Alert, List, Group, Badge, Image, Stack } from '@mantine/core';
 
 function HomePage() {
   const [events, setEvents] = useState([]);
@@ -35,19 +34,27 @@ function HomePage() {
       {loading && <Group position="center"><Loader /></Group>}
       {error && <Alert color="red" mb="md">{error}</Alert>}
       {!loading && !error && events.length === 0 && <Text>No events found.</Text>}
-      <List spacing="md" size="md" icon={<ThemeIcon color="blue" size={24} radius="xl"><IconCalendarEvent size={16} /></ThemeIcon>}>
+      <Stack spacing="md">
         {events.map((event) => (
-          <List.Item key={event.id}>
-            <Title order={4} mb={2}>
-              <Link to={`/events/${event.id}`}>{event.name}</Link>
-            </Title>
-            <Text>{event.description}</Text>
-            <Text size="sm" color="dimmed">
-              {new Date(event.start_time).toLocaleString()} - {new Date(event.end_time).toLocaleString()}
-            </Text>
-          </List.Item>
+          <Paper key={event.id} withBorder shadow="xs" p="md" radius="md">
+            <Group align="flex-start" spacing="md" noWrap>
+              {event.image && (
+                <Image src={event.image} alt={event.name} width={100} height={100} radius="md" fit="cover" style={{ objectFit: 'cover' }} />
+              )}
+              <div style={{ flex: 1 }}>
+                <Title order={4} mb={4}>
+                  <Link to={`/events/${event.id}`} style={{ textDecoration: 'none', color: '#228be6' }}>{event.name}</Link>
+                </Title>
+                <Group spacing={4} mt={4}>
+                  {event.tags && event.tags.map((tag, idx) => (
+                    <Badge key={idx} color="blue" variant="light">{tag}</Badge>
+                  ))}
+                </Group>
+              </div>
+            </Group>
+          </Paper>
         ))}
-      </List>
+      </Stack>
     </Paper>
   );
 }

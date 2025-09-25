@@ -49,14 +49,19 @@ class College(Base):
     # We tell it to use the registered_by_id column for the join.
     owner = relationship("User", back_populates="registered_colleges", foreign_keys=[registered_by_id])
 
+from sqlalchemy import JSON, Float, Date
+
 class Event(Base):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     description = Column(String)
-    start_time = Column(DateTime)
-    end_time = Column(DateTime)
+    date = Column(Date)
+    registration_fee = Column(Float, default=0)
+    tags = Column(JSON, default=list)  # List of strings
+    image = Column(String, nullable=True)  # URL or base64 string
+    external_links = Column(JSON, default=list)  # List of strings
 
     college_id = Column(Integer, ForeignKey("colleges.id"))
     college = relationship("College")

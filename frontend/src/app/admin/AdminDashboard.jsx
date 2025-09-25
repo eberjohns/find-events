@@ -135,7 +135,22 @@ function AdminDashboard() {
                 <td>{user.role}</td>
                 <td style={{ minWidth: 180 }}>
                   {user.role === 'REP' ? (
-                    allColleges.find(c => c.id === user.college_id)?.name || '—'
+                    allColleges.find(c => c.id === user.college_id)?.name ? (
+                      allColleges.find(c => c.id === user.college_id)?.name
+                    ) : (
+                      <>
+                        <Text color="red" size="sm">No college assigned!</Text>
+                        <Select
+                          id={`college-fix-${user.id}`}
+                          placeholder="Assign college"
+                          data={allColleges.map(college => ({ value: String(college.id), label: `${college.name} (${college.location})` }))}
+                        />
+                        <Button size="xs" color="blue" mt={4} onClick={() => {
+                          const collegeId = document.getElementById(`college-fix-${user.id}`).value;
+                          if (collegeId) assignRep(user.id, collegeId);
+                        }}>Assign</Button>
+                      </>
+                    )
                   ) : (
                     <Select
                       id={`college-${user.id}`}
