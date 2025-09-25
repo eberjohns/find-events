@@ -44,7 +44,16 @@ def assign_reprole(db: Session, user_id: int, college_id: int):
     return None
 
 def create_college_event(db: Session, event: schemas.EventCreate, college_id: int):
-    db_event = models.Event(**event.model_dump(), college_id=college_id)
+    db_event = models.Event(
+        name=event.name,
+        description=event.description,
+        date=event.date,
+        registration_fee=event.registration_fee,
+        tags=event.tags,
+        image=event.image,
+        external_links=event.external_links,
+        college_id=college_id
+    )
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
@@ -64,9 +73,13 @@ def get_event_by_id(db: Session, event_id: int):
 def update_event(db: Session, event_id: int, event_update: schemas.EventCreate):
     db_event = get_event_by_id(db, event_id)
     if db_event:
-        # Update the event's data from the request
-        for key, value in event_update.model_dump().items():
-            setattr(db_event, key, value)
+        db_event.name = event_update.name
+        db_event.description = event_update.description
+        db_event.date = event_update.date
+        db_event.registration_fee = event_update.registration_fee
+        db_event.tags = event_update.tags
+        db_event.image = event_update.image
+        db_event.external_links = event_update.external_links
         db.commit()
         db.refresh(db_event)
     return db_event

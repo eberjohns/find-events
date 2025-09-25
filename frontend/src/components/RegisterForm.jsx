@@ -1,6 +1,9 @@
-'''
-import React, { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { useState } from 'react';
+import { registerUser } from '../services/api';
+import { TextInput, PasswordInput, Button, Paper, Title, Alert } from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons-react';
+
+
 
 const RegisterForm = () => {
   const [email, setEmail] = useState('');
@@ -18,13 +21,45 @@ const RegisterForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-      <button type="submit">Register</button>
-    </form>
+    <Paper withBorder shadow="md" p="xl" mt="xl" radius="md" style={{ maxWidth: 450, margin: 'auto' }}>
+      <Title order={2} align="center" mb="lg">
+        Create an Account
+      </Title>
+
+      {success && (
+        <Alert color="green" mb="md">
+          Registration successful! You can now log in.
+        </Alert>
+      )}
+      {error && (
+        <Alert icon={<IconAlertCircle size="1rem" />} title="Error!" color="red" mb="md">
+          {error}
+        </Alert>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <TextInput
+          label="Email"
+          placeholder="you@email.com"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.currentTarget.value)}
+          mb="md"
+        />
+        <PasswordInput
+          label="Password"
+          placeholder="Your password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.currentTarget.value)}
+          mb="lg"
+        />
+        <Button type="submit" fullWidth>
+          Register
+        </Button>
+      </form>
+    </Paper>
   );
 };
 
 export default RegisterForm;
-'''

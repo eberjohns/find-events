@@ -1,0 +1,55 @@
+
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { Paper, Title, Text, Loader, Alert, List, ThemeIcon, Group, Container } from '@mantine/core';
+import { IconBookmark } from '@tabler/icons-react';
+import { Link } from 'react-router-dom';
+
+function MyEventsPage() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    if (!token) return;
+    fetch('http://127.0.0.1:8000/users/me/', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => res.json())
+      .then(user => {
+        setEvents(user.saved_events || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to load saved events.');
+        setLoading(false);
+      });
+  }, [token]);
+
+  return (
+    <Container size="sm" py="xl">
+      <Paper withBorder shadow="md" p="xl" radius="md">
+        <Title order={2} mb="md">My Saved Events</Title>
+        {loading && <Group position="center"><Loader /></Group>}
+        {error && <Alert color="red" mb="md">{error}</Alert>}
+        {!loading && !error && events.length === 0 && <Text>No saved events found.</Text>}
+        <List spacing="md" size="md" icon={<ThemeIcon color="yellow" size={24} radius="xl"><IconBookmark size={16} /></ThemeIcon>}>
+          {events.map(event => (
+            <List.Item key={event.id}>
+              <Link to={`/events/${event.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Title order={5} mb={2} style={{ cursor: 'pointer', color: '#228be6' }}>{event.name}</Title>
+                <Text size="sm" color="dimmed">{event.description}</Text>
+                <Text size="xs" color="dimmed">
+                  {new Date(event.start_time).toLocaleString()} - {new Date(event.end_time).toLocaleString()}
+                </Text>
+              </Link>
+            </List.Item>
+          ))}
+        </List>
+      </Paper>
+    </Container>
+  );
+}
+
+export default MyEventsPage;

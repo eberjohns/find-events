@@ -31,18 +31,29 @@ class College(BaseModel):
     class Config:
         from_attributes = True
 
+
+from typing import List, Optional
+from datetime import date
+
 class EventCreate(BaseModel):
     name: str
     description: str
-    start_time: datetime
-    end_time: datetime
+    date: date
+    registration_fee: float = 0
+    tags: List[str] = []
+    image: Optional[str] = None
+    external_links: List[str] = []
+
 
 class Event(BaseModel):
     id: int
     name: str
     description: str
-    start_time: datetime
-    end_time: datetime
+    date: date
+    registration_fee: float = 0
+    tags: List[str] = []
+    image: Optional[str] = None
+    external_links: List[str] = []
     college_id: int
 
     class Config:

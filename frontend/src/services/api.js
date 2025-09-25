@@ -1,4 +1,26 @@
-'''
+// Save an event for the current user
+export const saveEvent = (eventId, token) => {
+  return apiClient.post(`/users/me/saved-events/${eventId}`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Unsave an event for the current user
+export const unsaveEvent = (eventId, token) => {
+  return apiClient.delete(`/users/me/saved-events/${eventId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+// Fetch a single event by ID
+export const fetchEventById = (id) => {
+  return apiClient.get(`/events/${id}`);
+};
+// Create a new event (requires auth as REP)
+export const createEvent = (eventData, token) => {
+  return apiClient.post('/events/', eventData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
 import axios from 'axios';
 
 const apiClient = axios.create({
@@ -42,37 +64,12 @@ export default {
     return apiClient.delete(`/events/${id}`);
   },
 
-  // Users
-  getCurrentUser() {
-    return apiClient.get('/users/me');
-  },
-  saveEvent(eventId) {
-    return apiClient.post(`/users/me/saved-events/${eventId}`);
-  },
-  unsaveEvent(eventId) {
-    return apiClient.delete(`/users/me/saved-events/${eventId}`);
-  },
-
-  // Colleges
-  getColleges() {
-    return apiClient.get('/colleges');
-  },
-  registerCollege(collegeData) {
-    return apiClient.post('/colleges', collegeData);
-  },
-
-  // Admin
-  getPendingColleges() {
-    return apiClient.get('/admin/colleges/pending');
-  },
-  approveCollege(id) {
-    return apiClient.put(`/admin/colleges/${id}/approve`);
-  },
-  getUsers() {
-    return apiClient.get('/admin/users');
-  },
-  assignRepRole(id) {
-    return apiClient.put(`/admin/users/${id}/assign-rep`);
-  },
+  return apiClient.post('/auth/login', formData, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
 };
-'''
+
+// Fetch all events
+export const fetchEvents = () => {
+  return apiClient.get('/events/');
+};

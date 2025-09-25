@@ -1,49 +1,46 @@
-'''
 import React, { createContext, useState, useEffect } from 'react';
 import api from '../services/api';
 
-export const AuthContext = createContext();
-
-export const AuthProvider = ({ children }) => {
+const AuthContext = createContext(null);
+  const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      api.getCurrentUser().then(response => {
-        setUser(response.data);
-      }).catch(() => {
-        localStorage.removeItem('token');
-      }).finally(() => {
-        setLoading(false);
-      });
-    } else {
-      setLoading(false);
+    const storedToken = localStorage.getItem('authToken');
+    if (storedToken) {
+      setToken(storedToken);
     }
   }, []);
 
-  const login = async (credentials) => {
-    const response = await api.login(credentials);
-    localStorage.setItem('token', response.data.access_token);
-    const userResponse = await api.getCurrentUser();
-    setUser(userResponse.data);
-  };
+  useEffect(() => {
+    if (!token) {
+      setUser(null);
+      return;
+    }
+    fetch('http://127.0.0.1:8000/users/me/', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => res.json())
+      .then(setUser)
+      .catch(() => setUser(null));
+  }, [token]);
 
-  const register = async (userData) => {
-    await api.register(userData);
-    // You might want to automatically log in the user after registration
+  const login = async (email, password) => {
+    const response = await loginApi({ email, password });
+    const { access_token } = response.data;
+    localStorage.setItem('authToken', access_token);
+    setToken(access_token);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+    setToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ token, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
-'''
