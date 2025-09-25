@@ -1,27 +1,22 @@
-
 import { useState } from 'react';
 import { registerUser } from '../services/api';
 import { TextInput, PasswordInput, Button, Paper, Title, Alert } from '@mantine/core';
 import { IconAlertCircle } from '@tabler/icons-react';
 
 
-function RegisterForm() {
+
+const RegisterForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const { register } = useContext(AuthContext);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError(null);
-    setSuccess(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await registerUser({ email, password });
-      setSuccess(true);
-      setEmail('');
-      setPassword('');
-    } catch (err) {
-      setError(err.response?.data?.detail || 'An error occurred.');
+      await register({ email, password });
+      alert('Registration successful!');
+    } catch (error) {
+      alert('Registration failed.');
     }
   };
 
@@ -65,6 +60,6 @@ function RegisterForm() {
       </form>
     </Paper>
   );
-}
+};
 
 export default RegisterForm;
