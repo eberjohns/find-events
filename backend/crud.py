@@ -52,7 +52,8 @@ def create_college_event(db: Session, event: schemas.EventCreate, college_id: in
         tags=event.tags,
         image=event.image,
         external_links=event.external_links,
-        college_id=college_id
+        college_id=college_id,
+        display=event.display if hasattr(event, 'display') else True
     )
     db.add(db_event)
     db.commit()
@@ -80,6 +81,7 @@ def update_event(db: Session, event_id: int, event_update: schemas.EventCreate):
         db_event.tags = event_update.tags
         db_event.image = event_update.image
         db_event.external_links = event_update.external_links
+        db_event.display = event_update.display if hasattr(event_update, 'display') else db_event.display
         db.commit()
         db.refresh(db_event)
     return db_event

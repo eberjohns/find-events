@@ -1,5 +1,3 @@
-
-
 import { useState } from 'react';
 import { createEvent } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -14,16 +12,15 @@ import {
   FileInput,
   MultiSelect,
   NumberInput,
-  Chip,
   Stack
 } from '@mantine/core';
+import { ALLOWED_EVENT_TAGS } from '../../constants/eventTags';
 
 function CreateEventForm() {
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
   const [registrationFee, setRegistrationFee] = useState('');
   const [tags, setTags] = useState([]);
-  const [tagInput, setTagInput] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -42,17 +39,6 @@ function CreateEventForm() {
     } else {
       setImagePreview(null);
     }
-  };
-
-  // Handle tags as chips
-  const handleAddTag = () => {
-    if (tagInput && !tags.includes(tagInput)) {
-      setTags([...tags, tagInput]);
-      setTagInput('');
-    }
-  };
-  const handleRemoveTag = (tag) => {
-    setTags(tags.filter(t => t !== tag));
   };
 
   // Handle external links
@@ -104,7 +90,6 @@ function CreateEventForm() {
     setDate('');
     setRegistrationFee('');
     setTags([]);
-    setTagInput('');
     setDescription('');
     setImage(null);
     setImagePreview(null);
@@ -143,21 +128,16 @@ function CreateEventForm() {
           min={0}
           mb="md"
         />
-        <Group mb="md" align="flex-end">
-          <TextInput
-            label="Add Tag"
-            placeholder="Type tag and press Add"
-            value={tagInput}
-            onChange={e => setTagInput(e.currentTarget.value)}
-            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddTag(); } }}
-          />
-          <Button onClick={handleAddTag} variant="outline">Add</Button>
-        </Group>
-        <Group mb="md">
-          {tags.map(tag => (
-            <Chip key={tag} checked onChange={() => handleRemoveTag(tag)}>{tag}</Chip>
-          ))}
-        </Group>
+        <MultiSelect
+          label="Tags"
+          placeholder="Select event tags"
+          data={ALLOWED_EVENT_TAGS}
+          value={tags}
+          onChange={setTags}
+          searchable
+          clearable
+          mb="md"
+        />
         <Textarea
           label="Description"
           placeholder="Event description"

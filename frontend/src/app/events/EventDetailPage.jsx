@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchEventById, saveEvent, unsaveEvent } from '../../services/api';
@@ -21,12 +20,23 @@ function EventDetailPage() {
       .then(res => {
         setEvent(res.data);
         setLoading(false);
+        // Check if this event is in the user's saved events
+        if (token) {
+          fetch('http://127.0.0.1:8000/users/me/', {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then(res => res.json())
+            .then(user => {
+              const isSaved = (user.saved_events || []).some(e => e.id === parseInt(id));
+              setSaved(isSaved);
+            });
+        }
       })
       .catch(() => {
         setError('Failed to load event.');
         setLoading(false);
       });
-  }, [id]);
+  }, [id, token]);
 
   const handleSave = async () => {
     if (!token) return;

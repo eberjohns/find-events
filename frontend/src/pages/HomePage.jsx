@@ -92,30 +92,30 @@ function HomePage() {
       </Stack>
 
       {/* Past Events Section */}
-      <Title order={3} mt="xl" mb="md" color="gray">Past Events</Title>
-      {!loading && !error && pastEvents.length === 0 && <Text color="dimmed">No past events.</Text>}
-      <Stack spacing="md">
-        {pastEvents.map((event) => (
-          <Paper key={event.id} withBorder shadow="xs" p="md" radius="md" opacity={0.6}>
-            <Group align="flex-start" spacing="md" noWrap>
-              {event.image && (
-                <Image src={event.image} alt={event.name} width={100} height={100} radius="md" fit="cover" style={{ objectFit: 'cover', filter: 'grayscale(0.7)' }} />
-              )}
-              <div style={{ flex: 1 }}>
-                <Title order={4} mb={4} color="gray">
-                  <Link to={`/events/${event.id}`} style={{ textDecoration: 'none', color: '#868e96' }}>{event.name}</Link>
-                </Title>
-                <Group spacing={4} mt={4}>
-                  {event.tags && event.tags.map((tag, idx) => (
-                    <Badge key={idx} color="gray" variant="light">{tag}</Badge>
-                  ))}
-                </Group>
-              </div>
-            </Group>
-          </Paper>
-        ))}
-      </Stack>
-    </Paper>
+      {/* <Title order={3} mt="xl" mb="md" color="gray">Past Events</Title> */}
+      {/* {!loading && !error && pastEvents.length === 0 && <Text color="dimmed">No past events.</Text>} */}
+      {/* <Stack spacing="md"> */}
+        {/* {pastEvents.map((event) => ( */}
+          {/* <Paper key={event.id} withBorder shadow="xs" p="md" radius="md" opacity={0.6}> */}
+            {/* <Group align="flex-start" spacing="md" noWrap> */}
+              {/* {event.image && ( */}
+                {/* <Image src={event.image} alt={event.name} width={100} height={100} radius="md" fit="cover" style={{ objectFit: 'cover', filter: 'grayscale(0.7)' }} /> */}
+              {/* )} */}
+              {/* <div style={{ flex: 1 }}> */}
+                {/* <Title order={4} mb={4} color="gray"> */}
+                  {/* <Link to={`/events/${event.id}`} style={{ textDecoration: 'none', color: '#868e96' }}>{event.name}</Link> */}
+                {/* </Title> */}
+                {/* <Group spacing={4} mt={4}> */}
+                  {/* {event.tags && event.tags.map((tag, idx) => ( */}
+                    {/* <Badge key={idx} color="gray" variant="light">{tag}</Badge> */}
+                  {/* ))} */}
+                {/* </Group> */}
+              {/* </div> */}
+            {/* </Group> */}
+          {/* </Paper> */}
+        {/* ))} */}
+      {/* </Stack> */}
+   </Paper>
   );
 }
 
