@@ -3,6 +3,19 @@ from typing import Optional
 from datetime import datetime
 from typing import List
 
+ALLOWED_EVENT_TAGS = [
+    'Workshop',
+    'Seminar',
+    'Hackathon',
+    'Cultural',
+    'Sports',
+    'Tech Talk',
+    'Competition',
+    'Webinar',
+    'Festival',
+    'Other'
+]
+
 # Schema for receiving data when creating a user
 class UserCreate(BaseModel):
     email: str
@@ -44,6 +57,24 @@ class EventCreate(BaseModel):
     image: Optional[str] = None
     external_links: List[str] = []
 
+    @classmethod
+    def validate(cls, values):
+        tags = values.get('tags', [])
+        invalid = [tag for tag in tags if tag not in ALLOWED_EVENT_TAGS]
+        if invalid:
+            raise ValueError(f"Invalid tags: {invalid}. Allowed tags: {ALLOWED_EVENT_TAGS}")
+        return values
+
+    class Config:
+        arbitrary_types_allowed = True
+        validate_assignment = True
+        extra = 'forbid'
+
+    # Pydantic v1: use root_validator
+    @classmethod
+    def __get_validators__(cls):
+        yield from super().__get_validators__()
+        yield cls.validate
 
 class Event(BaseModel):
     id: int
