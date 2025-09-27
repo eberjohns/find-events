@@ -1,9 +1,9 @@
-
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Paper, Title, Text, Loader, Alert, List, ThemeIcon, Group, Container } from '@mantine/core';
+import { Paper, Title, Text, Loader, Alert, List, ThemeIcon, Group, Container, Button } from '@mantine/core';
 import { IconBookmark } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
+import { unsaveEvent } from '../../services/api';
 
 function MyEventsPage() {
   const [events, setEvents] = useState([]);
@@ -27,6 +27,16 @@ function MyEventsPage() {
       });
   }, [token]);
 
+  const handleUnsave = async (eventId) => {
+    if (!token) return;
+    try {
+      await unsaveEvent(eventId, token);
+      setEvents(events.filter(e => e.id !== eventId));
+    } catch {
+      setError('Failed to unsave event.');
+    }
+  };
+
   return (
     <Container size="sm" py="xl">
       <Paper withBorder shadow="md" p="xl" radius="md">
@@ -37,13 +47,18 @@ function MyEventsPage() {
         <List spacing="md" size="md" icon={<ThemeIcon color="yellow" size={24} radius="xl"><IconBookmark size={16} /></ThemeIcon>}>
           {events.map(event => (
             <List.Item key={event.id}>
-              <Link to={`/events/${event.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Title order={5} mb={2} style={{ cursor: 'pointer', color: '#228be6' }}>{event.name}</Title>
-                <Text size="sm" color="dimmed">{event.description}</Text>
-                <Text size="xs" color="dimmed">
-                  {new Date(event.start_time).toLocaleString()} - {new Date(event.end_time).toLocaleString()}
-                </Text>
-              </Link>
+              <Group position="apart" align="center">
+                <Link to={`/events/${event.id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}>
+                  <Title order={5} mb={2} style={{ cursor: 'pointer', color: '#228be6' }}>{event.name}</Title>
+                  <Text size="sm" color="dimmed">{event.description}</Text>
+                  <Text size="xs" color="dimmed">
+                    {new Date(event.start_time).toLocaleString()} - {new Date(event.end_time).toLocaleString()}
+                  </Text>
+                </Link>
+                <Button color="yellow" variant="outline" size="xs" onClick={() => handleUnsave(event.id)}>
+                  Unsave
+                </Button>
+              </Group>
             </List.Item>
           ))}
         </List>
