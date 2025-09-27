@@ -56,6 +56,7 @@ class EventCreate(BaseModel):
     tags: List[str] = []
     image: Optional[str] = None
     external_links: List[str] = []
+    display: Optional[bool] = True
 
     @classmethod
     def validate(cls, values):
@@ -86,6 +87,7 @@ class Event(BaseModel):
     image: Optional[str] = None
     external_links: List[str] = []
     college_id: int
+    display: Optional[bool] = True
 
     class Config:
         from_attributes = True

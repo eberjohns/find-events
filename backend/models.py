@@ -62,6 +62,7 @@ class Event(Base):
     tags = Column(JSON, default=list)  # List of strings
     image = Column(String, nullable=True)  # URL or base64 string
     external_links = Column(JSON, default=list)  # List of strings
+    display = Column(Boolean, default=True)
 
     college_id = Column(Integer, ForeignKey("colleges.id"))
     college = relationship("College")

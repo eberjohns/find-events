@@ -161,8 +161,17 @@ def read_colleges(db: Session = Depends(get_db)):
 
 @app.get("/events/", response_model=list[schemas.Event])
 def read_events(db: Session = Depends(get_db)):
+    from datetime import date as dtdate
+    today = dtdate.today()
     events = crud.get_events(db)
-    return events
+    # Set display=False for past events, True for upcoming
+    for event in events:
+        if hasattr(event, 'date') and event.date:
+            event.display = event.date >= today
+        else:
+            event.display = True
+    # Only return events with display True
+    return [e for e in events if getattr(e, 'display', True)]
 
 @app.put("/events/{event_id}", response_model=schemas.Event)
 def update_event_endpoint(
