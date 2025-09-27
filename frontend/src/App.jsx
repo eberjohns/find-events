@@ -1,15 +1,19 @@
+'''
+import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import { AuthProvider } from './context/AuthContext';
 
-function App() {
+const App = () => {
   return (
-    <div>
+    <AuthProvider>
       <Navbar />
       <main>
         <Outlet />
       </main>
-    </div>
+    </AuthProvider>
   );
-}
+};
 
 export default App;
+'''

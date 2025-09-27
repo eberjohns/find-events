@@ -10,9 +10,9 @@ import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import CreateEventPage from './app/create-event/CreateEventPage';
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     children: [
       { index: true, element: <HomePage /> },
@@ -26,3 +26,5 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
+
+export default router;

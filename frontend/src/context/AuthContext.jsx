@@ -1,11 +1,7 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { loginUser as loginApi } from '../services/api';
-
+import React, { createContext, useState, useEffect } from 'react';
+import api from '../services/api';
 
 const AuthContext = createContext(null);
-
-
-export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
 
@@ -47,9 +43,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-// Custom hook to use the auth context
-export const useAuth = () => {
-  return useContext(AuthContext);
 };

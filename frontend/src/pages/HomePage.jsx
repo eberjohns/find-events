@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from 'react';
 import { fetchEvents } from '../services/api';
 import { Link } from 'react-router-dom';
