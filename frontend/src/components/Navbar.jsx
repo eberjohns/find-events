@@ -1,38 +1,41 @@
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Group, Button, Container, Paper, Title } from '@mantine/core';
+import classes from './Navbar.module.css';
 
 function Navbar() {
   const { token, user, logout } = useAuth();
 
+  const getClassName = ({ isActive }) => `${classes.link} ${isActive ? classes.active : ''}`;
+
   return (
-    <Paper shadow="sm" radius={0} p="md" withBorder style={{ marginBottom: 24 }}>
+    <Paper shadow="xs" radius={0} p="md">
       <Container size="lg">
-        <Group position="apart" align="center">
-          <Title order={3} style={{ margin: 0 }}>
-            <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Group justify="space-between" align="center">
+          <Title order={3}>
+            <NavLink to="/" className={`${classes.link} ${classes.brand}`}>
               FindEvents
-            </Link>
+            </NavLink>
           </Title>
-          <Group spacing="md">
-            <NavLink to="/">Home</NavLink>
+          <Group gap="xs">
+            <NavLink to="/" className={getClassName}>Home</NavLink>
             {token ? (
               <>
-                <NavLink to="/my-events">My Events</NavLink>
+                <NavLink to="/my-events" className={getClassName}>My Events</NavLink>
                 {(user?.role === 'REP' || user?.role === 'MAIN_REP') && (
-                  <NavLink to="/create-event">Create Event</NavLink>
+                  <NavLink to="/create-event" className={getClassName}>Create Event</NavLink>
                 )}
                 {user?.role === 'USER' && (
                   <>
-                    <NavLink to="/register-college">Register College</NavLink>
-                    <NavLink to="/apply-for-rep">Apply for REP</NavLink>
+                    <NavLink to="/register-college" className={getClassName}>Register College</NavLink>
+                    <NavLink to="/apply-for-rep" className={getClassName}>Apply for REP</NavLink>
                   </>
                 )}
                 {user?.role === 'MAIN_REP' && (
-                  <NavLink to="/requests">Requests</NavLink>
+                  <NavLink to="/requests" className={getClassName}>Requests</NavLink>
                 )}
                 {user && user.role === 'ADMIN' && (
-                  <NavLink to="/admin">Admin</NavLink>
+                  <NavLink to="/admin" className={getClassName}>Admin</NavLink>
                 )}
                 <Button variant="outline" color="red" size="xs" onClick={logout}>
                   Logout
@@ -40,8 +43,8 @@ function Navbar() {
               </>
             ) : (
               <>
-                <NavLink to="/login">Login</NavLink>
-                <NavLink to="/register">Register</NavLink>
+                <NavLink to="/login" className={getClassName}>Login</NavLink>
+                <NavLink to="/register" className={getClassName}>Register</NavLink>
               </>
             )}
           </Group>

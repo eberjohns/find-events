@@ -1,0 +1,38 @@
+.link {
+  display: block;
+  line-height: 1;
+  padding: 8px 12px;
+  border-radius: var(--mantine-radius-sm);
+  text-decoration: none;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 500;
+
+  @mixin hover {
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+  }
+}
+
+.active {
+  &,
+  &:hover {
+    background-color: var(--mantine-color-blue-light);
+    color: var(--mantine-color-blue-light-color);
+  }
+}
+
+.brand {
+  font-weight: 700;
+  font-size: var(--mantine-font-size-lg);
+  background: -webkit-linear-gradient(
+    45deg,
+    var(--mantine-color-blue-5),
+    var(--mantine-color-cyan-5)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @mixin hover {
+    background-color: transparent;
+  }
+}

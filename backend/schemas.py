@@ -88,6 +88,7 @@ class Event(BaseModel):
     external_links: List[str] = []
     college_id: int
     display: Optional[bool] = True
+    college: College
 
     class Config:
         from_attributes = True
