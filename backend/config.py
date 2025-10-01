@@ -1,7 +1,9 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    SECRET_KEY: str = "@G7-1Q(,IN2>;ScT5}1XYHLZ9'=R}KIt}9};`BjAD?xRscZt8UcA?WQwwF<WZ"
+    # By not providing a default value, Pydantic will REQUIRE these to be set in the .env file. This is much safer.
+    SECRET_KEY: str
+    DATABASE_URL: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 

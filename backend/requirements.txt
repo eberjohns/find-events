@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+SQLAlchemy
+pydantic
+pydantic-settings
+bcrypt==3.2.2
+python-jose
+psycopg2
+passlib
+python-multipart
