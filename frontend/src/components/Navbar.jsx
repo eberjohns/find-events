@@ -19,7 +19,7 @@ function Navbar() {
             {token ? (
               <>
                 <NavLink to="/my-events">My Events</NavLink>
-                {user?.role === 'REP' && (
+                {(user?.role === 'REP' || user?.role === 'MAIN_REP') && (
                   <NavLink to="/create-event">Create Event</NavLink>
                 )}
                 {user?.role === 'USER' && (
@@ -28,7 +28,7 @@ function Navbar() {
                     <NavLink to="/apply-for-rep">Apply for REP</NavLink>
                   </>
                 )}
-                {user?.role === 'REP' && (
+                {user?.role === 'MAIN_REP' && (
                   <NavLink to="/requests">Requests</NavLink>
                 )}
                 {user && user.role === 'ADMIN' && (

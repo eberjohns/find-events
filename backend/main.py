@@ -136,12 +136,21 @@ def assign_rep_role_endpoint(
         )
     return updated_user
 
-# Dependency for requiring a user to be a REP
+# Dependency for requiring a user to be a REP or MAIN_REP
 def get_current_rep_user(current_user: models.User = Depends(get_current_user)):
-    if current_user.role != "REP" or not current_user.college_id:
+    if current_user.role not in ["REP", "MAIN_REP"] or not current_user.college_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User must be a College Representative to create events",
+        )
+    return current_user
+
+# Dependency for requiring a user to be a MAIN_REP
+def get_current_main_rep_user(current_user: models.User = Depends(get_current_user)):
+    if current_user.role != "MAIN_REP" or not current_user.college_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User must be the Main College Representative",
         )
     return current_user
 
@@ -203,7 +212,7 @@ def delete_event_endpoint(
     # Authorization Check:
     is_admin = current_user.role == "ADMIN"
     is_rep_owner = (
-        current_user.role == "REP" and
+        current_user.role in ["REP", "MAIN_REP"] and
         db_event.college_id == current_user.college_id
     )
 
@@ -261,18 +270,18 @@ def apply_for_rep(
 @app.get("/rep-applications/", response_model=list[schemas.RepApplication])
 def get_rep_applications(
     db: Session = Depends(get_db),
-    rep_user: models.User = Depends(get_current_rep_user)
+    main_rep_user: models.User = Depends(get_current_main_rep_user)
 ):
-    return crud.get_rep_applications_for_college(db, college_id=rep_user.college_id)
+    return crud.get_rep_applications_for_college(db, college_id=main_rep_user.college_id)
 
 @app.put("/rep-applications/{application_id}/approve", response_model=schemas.RepApplication)
 def approve_application(
     application_id: int,
     db: Session = Depends(get_db),
-    rep_user: models.User = Depends(get_current_rep_user)
+    main_rep_user: models.User = Depends(get_current_main_rep_user)
 ):
     application = crud.get_rep_application_by_id(db, application_id)
-    if not application or application.college_id != rep_user.college_id:
+    if not application or application.college_id != main_rep_user.college_id:
         raise HTTPException(status_code=404, detail="Application not found")
     return crud.approve_rep_application(db, application_id)
 
@@ -280,9 +289,9 @@ def approve_application(
 def reject_application(
     application_id: int,
     db: Session = Depends(get_db),
-    rep_user: models.User = Depends(get_current_rep_user)
+    main_rep_user: models.User = Depends(get_current_main_rep_user)
 ):
     application = crud.get_rep_application_by_id(db, application_id)
-    if not application or application.college_id != rep_user.college_id:
+    if not application or application.college_id != main_rep_user.college_id:
         raise HTTPException(status_code=404, detail="Application not found")
     return crud.reject_rep_application(db, application_id)

@@ -26,19 +26,19 @@ def approve_college(db: Session, college_id: int):
     db_college = db.query(models.College).filter(models.College.id == college_id).first()
     if db_college:
         db_college.is_approved = True
-        # Automatically assign the REP role to the user who registered the college
-        assign_reprole(db, user_id=db_college.registered_by_id, college_id=college_id)
+        # Automatically assign the MAIN_REP role to the user who registered the college
+        assign_reprole(db, user_id=db_college.registered_by_id, college_id=college_id, is_main_rep=True)
         db.commit()
         db.refresh(db_college)
     return db_college
 
-def assign_reprole(db: Session, user_id: int, college_id: int):
+def assign_reprole(db: Session, user_id: int, college_id: int, is_main_rep: bool = False):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     db_college = db.query(models.College).filter(models.College.id == college_id).first()
 
     # Check if user and an approved college exist
     if db_user and db_college and db_college.is_approved:
-        db_user.role = "REP"
+        db_user.role = "MAIN_REP" if is_main_rep else "REP"
         db_user.college_id = college_id
         db.commit()
         db.refresh(db_user)
