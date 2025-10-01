@@ -70,3 +70,14 @@ class Event(Base):
     saved_by_users = relationship(
         "User", secondary=user_saved_events, back_populates="saved_events"
     )
+
+class RepApplication(Base):
+    __tablename__ = "rep_applications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    college_id = Column(Integer, ForeignKey("colleges.id"))
+    status = Column(String, default="pending")  # pending, approved, rejected
+
+    user = relationship("User")
+    college = relationship("College")

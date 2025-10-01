@@ -26,6 +26,8 @@ def approve_college(db: Session, college_id: int):
     db_college = db.query(models.College).filter(models.College.id == college_id).first()
     if db_college:
         db_college.is_approved = True
+        # Automatically assign the REP role to the user who registered the college
+        assign_reprole(db, user_id=db_college.registered_by_id, college_id=college_id)
         db.commit()
         db.refresh(db_college)
     return db_college
@@ -106,3 +108,34 @@ def unsave_event_for_user(db: Session, user: models.User, event: models.Event):
     user.saved_events.remove(event)
     db.commit()
     return user
+
+# New CRUD functions for RepApplication
+def create_rep_application(db: Session, user_id: int, college_id: int):
+    db_application = models.RepApplication(user_id=user_id, college_id=college_id)
+    db.add(db_application)
+    db.commit()
+    db.refresh(db_application)
+    return db_application
+
+def get_rep_applications_for_college(db: Session, college_id: int):
+    return db.query(models.RepApplication).filter(models.RepApplication.college_id == college_id).all()
+
+def get_rep_application_by_id(db: Session, application_id: int):
+    return db.query(models.RepApplication).filter(models.RepApplication.id == application_id).first()
+
+def approve_rep_application(db: Session, application_id: int):
+    db_application = get_rep_application_by_id(db, application_id)
+    if db_application and db_application.status == "pending":
+        db_application.status = "approved"
+        assign_reprole(db, user_id=db_application.user_id, college_id=db_application.college_id)
+        db.commit()
+        db.refresh(db_application)
+    return db_application
+
+def reject_rep_application(db: Session, application_id: int):
+    db_application = get_rep_application_by_id(db, application_id)
+    if db_application and db_application.status == "pending":
+        db_application.status = "rejected"
+        db.commit()
+        db.refresh(db_application)
+    return db_application

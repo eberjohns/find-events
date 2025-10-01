@@ -249,3 +249,40 @@ def unsave_event(
     if not event_to_unsave:
         raise HTTPException(status_code=404, detail="Event not found")
     return crud.unsave_event_for_user(db=db, user=current_user, event=event_to_unsave)
+
+@app.post("/rep-applications/", response_model=schemas.RepApplication)
+def apply_for_rep(
+    application: schemas.RepApplicationCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    return crud.create_rep_application(db, user_id=current_user.id, college_id=application.college_id)
+
+@app.get("/rep-applications/", response_model=list[schemas.RepApplication])
+def get_rep_applications(
+    db: Session = Depends(get_db),
+    rep_user: models.User = Depends(get_current_rep_user)
+):
+    return crud.get_rep_applications_for_college(db, college_id=rep_user.college_id)
+
+@app.put("/rep-applications/{application_id}/approve", response_model=schemas.RepApplication)
+def approve_application(
+    application_id: int,
+    db: Session = Depends(get_db),
+    rep_user: models.User = Depends(get_current_rep_user)
+):
+    application = crud.get_rep_application_by_id(db, application_id)
+    if not application or application.college_id != rep_user.college_id:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return crud.approve_rep_application(db, application_id)
+
+@app.put("/rep-applications/{application_id}/reject", response_model=schemas.RepApplication)
+def reject_application(
+    application_id: int,
+    db: Session = Depends(get_db),
+    rep_user: models.User = Depends(get_current_rep_user)
+):
+    application = crud.get_rep_application_by_id(db, application_id)
+    if not application or application.college_id != rep_user.college_id:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return crud.reject_rep_application(db, application_id)

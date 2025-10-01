@@ -106,3 +106,17 @@ class User(BaseModel):
 
     class Config:
         from_attributes = True
+
+class RepApplicationCreate(BaseModel):
+    college_id: int
+
+class RepApplication(BaseModel):
+    id: int
+    user_id: int
+    college_id: int
+    status: str
+    user: User
+    college: College
+
+    class Config:
+        from_attributes = True
