@@ -1,9 +1,6 @@
-
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Group, Button, Container, Paper, Title } from '@mantine/core';
-
-
 
 function Navbar() {
   const { token, user, logout } = useAuth();
@@ -22,11 +19,17 @@ function Navbar() {
             {token ? (
               <>
                 <NavLink to="/my-events">My Events</NavLink>
-                {user?.role !== 'ADMIN' && (
+                {user?.role === 'REP' && (
                   <NavLink to="/create-event">Create Event</NavLink>
                 )}
-                {(!user || (user.role !== 'REP' && user.role !== 'ADMIN') || !user.college_id) && user?.role !== 'ADMIN' && (
-                  <NavLink to="/register-college">Register College</NavLink>
+                {user?.role === 'USER' && (
+                  <>
+                    <NavLink to="/register-college">Register College</NavLink>
+                    <NavLink to="/apply-for-rep">Apply for REP</NavLink>
+                  </>
+                )}
+                {user?.role === 'REP' && (
+                  <NavLink to="/requests">Requests</NavLink>
                 )}
                 {user && user.role === 'ADMIN' && (
                   <NavLink to="/admin">Admin</NavLink>

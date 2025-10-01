@@ -9,6 +9,8 @@ import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import CreateEventPage from './app/create-event/CreateEventPage';
+import ApplyForRepPage from './app/apply-for-rep/ApplyForRepPage';
+import RequestsPage from './app/requests/RequestsPage';
 
 export const router = createBrowserRouter([
   {
@@ -18,11 +20,13 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
-  { path: "create-event", element: <CreateEventPage /> },
-  { path: "events/:id", element: <EventDetailPage /> },
-  { path: "my-events", element: <MyEventsPage /> },
-  { path: "admin", element: <AdminDashboard /> },
-  { path: "register-college", element: <RegisterCollegePage /> },
+      { path: "create-event", element: <CreateEventPage /> },
+      { path: "events/:id", element: <EventDetailPage /> },
+      { path: "my-events", element: <MyEventsPage /> },
+      { path: "admin", element: <AdminDashboard /> },
+      { path: "register-college", element: <RegisterCollegePage /> },
+      { path: "apply-for-rep", element: <ApplyForRepPage /> },
+      { path: "requests", element: <RequestsPage /> },
     ],
   },
 ]);
