@@ -1,18 +1,31 @@
-
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Paper, Title, Text, Button, Group, Loader, Alert, Table, Select, Container, Space } from '@mantine/core';
+import {
+  Paper,
+  Title,
+  Text,
+  Button,
+  Group,
+  Loader,
+  Alert,
+  Table,
+  Container,
+  Accordion,
+  Badge,
+  Stack,
+} from '@mantine/core';
 
 function AdminDashboard() {
   const { token } = useAuth();
   const [pendingColleges, setPendingColleges] = useState([]);
   const [users, setUsers] = useState([]);
+  const [allColleges, setAllColleges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [allColleges, setAllColleges] = useState([]);
-  useEffect(() => {
+  const fetchData = () => {
     if (!token) return;
+    setLoading(true);
     Promise.all([
       fetch('http://127.0.0.1:8000/admin/colleges/pending/', {
         headers: { Authorization: `Bearer ${token}` },
@@ -24,169 +37,142 @@ function AdminDashboard() {
         headers: { Authorization: `Bearer ${token}` },
       }).then(res => res.json()),
     ])
-      .then(([colleges, users, allColleges]) => {
-        setPendingColleges(colleges);
-        setUsers(users);
-        setAllColleges(allColleges);
+      .then(([pending, usersData, all]) => {
+        setPendingColleges(pending);
+        setUsers(usersData);
+        setAllColleges(all);
         setLoading(false);
       })
       .catch(() => {
         setError('Failed to load admin data.');
         setLoading(false);
       });
-  }, [token]);
+  };
+
+  useEffect(fetchData, [token]);
 
   const approveCollege = async (collegeId) => {
     await fetch(`http://127.0.0.1:8000/admin/colleges/${collegeId}/approve`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}` },
     });
-    setPendingColleges(pendingColleges.filter(c => c.id !== collegeId));
-    // Refresh allColleges after approval
-    fetch('http://127.0.0.1:8000/colleges/', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(setAllColleges);
+    // Refresh all data after an approval
+    fetchData();
   };
 
-  const assignRep = async (userId, collegeId) => {
-    await fetch(`http://127.0.0.1:8000/admin/users/${userId}/assign-rep`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ college_id: collegeId }),
-    });
-    // Optionally update UI
-  };
+  if (loading) return <Group justify="center" mt="xl"><Loader /></Group>;
+  if (error) return <Alert color="red" mt="xl">{error}</Alert>;
 
-  if (loading) return <Group position="center"><Loader /></Group>;
-  if (error) return <Alert color="red">{error}</Alert>;
+  const roleColors = {
+    ADMIN: 'pink',
+    MAIN_REP: 'cyan',
+    REP: 'blue',
+    USER: 'gray',
+  };
 
   return (
-    <Container size="md" py="xl">
-      <Paper withBorder shadow="md" p="xl" radius="md">
-        <Title order={2} mb="md">Admin Dashboard</Title>
+    <Container size="lg" py="xl">
+      <Stack gap="xl">
+        <Title order={1} style={{ fontWeight: 800 }}>Admin Dashboard</Title>
 
-        <Title order={4} mt="md" mb="xs">Pending Colleges</Title>
-        {pendingColleges.length === 0 ? (
-          <Text color="dimmed">No pending colleges.</Text>
-        ) : (
-          <Table striped highlightOnHover withBorder mb="md">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Location</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pendingColleges.map(college => (
-                <tr key={college.id}>
-                  <td>{college.name}</td>
-                  <td>{college.location}</td>
-                  <td>
-                    <Button size="xs" color="green" onClick={() => approveCollege(college.id)}>
-                      Approve
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        )}
+        <Accordion defaultValue="pending-colleges" variant="separated">
+          <Accordion.Item value="pending-colleges">
+            <Accordion.Control>
+              <Title order={4}>Pending College Approvals ({pendingColleges.length})</Title>
+            </Accordion.Control>
+            <Accordion.Panel>
+              {pendingColleges.length === 0 ? (
+                <Text c="dimmed" mt="md">No pending colleges.</Text>
+              ) : (
+                <Table striped highlightOnHover withTableBorder mt="md">
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Name</Table.Th>
+                      <Table.Th>Location</Table.Th>
+                      <Table.Th>Action</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {pendingColleges.map(college => (
+                      <Table.Tr key={college.id}>
+                        <Table.Td>{college.name}</Table.Td>
+                        <Table.Td>{college.location}</Table.Td>
+                        <Table.Td>
+                          <Button size="xs" color="green" onClick={() => approveCollege(college.id)}>
+                            Approve
+                          </Button>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              )}
+            </Accordion.Panel>
+          </Accordion.Item>
 
-        <Title order={4} mt="lg" mb="xs">All Colleges</Title>
-        <Table striped highlightOnHover withBorder mb="md">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Location</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allColleges.map(college => (
-              <tr key={college.id}>
-                <td>{college.name}</td>
-                <td>{college.location}</td>
-                <td>{college.is_approved ? 'Approved' : 'Pending'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+          <Accordion.Item value="college-management">
+            <Accordion.Control>
+              <Title order={4}>College Management</Title>
+            </Accordion.Control>
+            <Accordion.Panel>
+              <Table striped highlightOnHover withTableBorder mt="md">
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Name</Table.Th>
+                    <Table.Th>Location</Table.Th>
+                    <Table.Th>Status</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {allColleges.map(college => (
+                    <Table.Tr key={college.id}>
+                      <Table.Td>{college.name}</Table.Td>
+                      <Table.Td>{college.location}</Table.Td>
+                      <Table.Td>
+                        <Badge color={college.is_approved ? 'green' : 'orange'} variant="light">
+                          {college.is_approved ? 'Approved' : 'Pending'}
+                        </Badge>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Accordion.Panel>
+          </Accordion.Item>
 
-        <Title order={4} mt="lg" mb="xs">Assign Rep Role</Title>
-        <Table striped highlightOnHover withBorder>
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Role</th>
-              <th>College</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.filter(user => user.role !== 'ADMIN').map(user => (
-              <tr key={user.id}>
-                <td>{user.email}</td>
-                <td>{user.role}</td>
-                <td style={{ minWidth: 180 }}>
-                  {user.role === 'REP' ? (
-                    allColleges.find(c => c.id === user.college_id)?.name ? (
-                      allColleges.find(c => c.id === user.college_id)?.name
-                    ) : (
-                      <>
-                        <Text color="red" size="sm">No college assigned!</Text>
-                        <Select
-                          id={`college-fix-${user.id}`}
-                          placeholder="Assign college"
-                          data={allColleges.map(college => ({ value: String(college.id), label: `${college.name} (${college.location})` }))}
-                        />
-                        <Button size="xs" color="blue" mt={4} onClick={() => {
-                          const collegeId = document.getElementById(`college-fix-${user.id}`).value;
-                          if (collegeId) assignRep(user.id, collegeId);
-                        }}>Assign</Button>
-                      </>
-                    )
-                  ) : (
-                    <Select
-                      id={`college-${user.id}`}
-                      placeholder="Select college"
-                      data={allColleges.map(college => ({ value: String(college.id), label: `${college.name} (${college.location})` }))}
-                      disabled={user.role !== 'USER'}
-                    />
-                  )}
-                </td>
-                <td>
-                  {user.role === 'REP' ? (
-                    <Button size="xs" color="red" onClick={async () => {
-                      // Demote rep to user
-                      await fetch(`http://127.0.0.1:8000/admin/users/${user.id}/demote-rep`, {
-                        method: 'PUT',
-                        headers: { Authorization: `Bearer ${token}` },
-                      });
-                      // Optionally update UI
-                    }}>
-                      Demote to User
-                    </Button>
-                  ) : user.role === 'USER' ? (
-                    <Button size="xs" onClick={() => {
-                      const collegeId = document.getElementById(`college-${user.id}`).value;
-                      if (collegeId) assignRep(user.id, collegeId);
-                    }} disabled>
-                      Assign Rep
-                    </Button>
-                  ) : null}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Paper>
-      <Space h="xl" />
+          <Accordion.Item value="all-users">
+            <Accordion.Control>
+              <Title order={4}>User Management</Title>
+            </Accordion.Control>
+            <Accordion.Panel>
+              <Table striped highlightOnHover withTableBorder mt="md">
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>User Email</Table.Th>
+                    <Table.Th>Role</Table.Th>
+                    <Table.Th>Assigned College</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {users.map(user => (
+                    <Table.Tr key={user.id}>
+                      <Table.Td>{user.email}</Table.Td>
+                      <Table.Td>
+                        <Badge color={roleColors[user.role]} variant="light">
+                          {user.role}
+                        </Badge>
+                      </Table.Td>
+                      <Table.Td>
+                        {user.college_id ? (allColleges.find(c => c.id === user.college_id)?.name || 'N/A') : 'None'}
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      </Stack>
     </Container>
   );
 }

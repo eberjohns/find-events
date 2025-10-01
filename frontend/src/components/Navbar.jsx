@@ -1,12 +1,18 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Group, Button, Container, Paper, Title } from '@mantine/core';
 import classes from './Navbar.module.css';
 
 function Navbar() {
   const { token, user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const getClassName = ({ isActive }) => `${classes.link} ${isActive ? classes.active : ''}`;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <Paper shadow="xs" radius={0} p="md">
@@ -22,7 +28,7 @@ function Navbar() {
             {token ? (
               <>
                 <NavLink to="/my-events" className={getClassName}>My Events</NavLink>
-                {(user?.role === 'REP' || user?.role === 'MAIN_REP') && (
+                {(user?.role === 'REP') && (// || user?.role === 'MAIN_REP'
                   <NavLink to="/create-event" className={getClassName}>Create Event</NavLink>
                 )}
                 {user?.role === 'USER' && (
@@ -37,7 +43,7 @@ function Navbar() {
                 {user && user.role === 'ADMIN' && (
                   <NavLink to="/admin" className={getClassName}>Admin</NavLink>
                 )}
-                <Button variant="outline" color="red" size="xs" onClick={logout}>
+                <Button variant="outline" color="red" size="xs" onClick={handleLogout}>
                   Logout
                 </Button>
               </>
