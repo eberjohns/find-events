@@ -1,15 +1,9 @@
-'''
-import React from 'react';
 import LoginForm from '../components/LoginForm';
 
-const LoginPage = () => {
+function LoginPage() {
   return (
-    <div>
-      <h1>Login</h1>
-      <LoginForm />
-    </div>
+    <LoginForm />
   );
-};
+}
 
 export default LoginPage;
-'''

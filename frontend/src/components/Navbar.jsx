@@ -1,3 +1,4 @@
+
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Group, Button, Container, Paper, Title } from '@mantine/core';
@@ -45,6 +46,6 @@ function Navbar() {
       </Container>
     </Paper>
   );
-};
+}
 
 export default Navbar;
